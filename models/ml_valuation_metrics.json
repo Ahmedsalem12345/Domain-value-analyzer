@@ -1,0 +1,19 @@
+{
+  "n_train": 4236,
+  "n_test": 1060,
+  "regression": {
+    "rmse_log": 0.8545025056337466,
+    "mae_log": 0.6631560391504813,
+    "rmse_usd": 61085.50375568802,
+    "mae_usd": 21012.769527467888
+  },
+  "classification": {
+    "accuracy": 0.780188679245283,
+    "classes": [
+      "BUY",
+      "GEM",
+      "HOLD",
+      "PASS"
+    ]
+  }
+}

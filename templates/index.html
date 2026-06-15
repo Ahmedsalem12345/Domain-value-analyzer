@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Value Analyzer — V4 Market Intelligence</title>
+<meta name="description" content="Professional domain evaluation — Market Intelligence scoring with investor logic">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080f;--bg2:#0b0f1a;--bg3:rgba(14,20,34,.85);--bg4:#111827;
+  --bdr:rgba(30,50,80,.45);--bdr2:rgba(14,165,233,.25);
+  --pri:#0ea5e9;--pri2:#38bdf8;--pri3:#7dd3fc;
+  --grn:#4ade80;--grn2:#14532d;--amb:#fbbf24;--amb2:#78350f;
+  --red:#f87171;--red2:#3b1f1f;--pur:#a78bfa;
+  --gem1:#f59e0b;--gem2:#d97706;--gem3:rgba(245,158,11,.15);
+  --geo1:#06b6d4;--geo2:rgba(6,182,212,.15);
+  --txt:#e2e8f0;--txt2:#94a3b8;--txt3:#475569;--txt4:#334155;
+  --glow:rgba(14,165,233,.08);
+  --hold:#818cf8;--hold2:rgba(129,140,248,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--txt4);border-radius:4px}
+.container{max-width:1580px;margin:0 auto;padding:16px 24px}
+
+/* Header */
+.header{text-align:center;margin-bottom:20px;position:relative}
+h1{font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,var(--pri2),var(--pri3),var(--pur));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:2px;letter-spacing:-.02em}
+.sub{color:var(--txt3);font-size:.76rem;margin-bottom:4px}
+.version{display:inline-block;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:.58rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:.05em}
+
+/* Cards */
+.card{background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:16px 20px;backdrop-filter:blur(12px);transition:border-color .3s,box-shadow .3s;margin-bottom:14px}
+.card:hover{border-color:var(--bdr2);box-shadow:0 0 20px var(--glow)}
+.card-title{color:var(--pri2);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+
+/* Upload */
+.upload-tabs{display:flex;gap:6px;margin-bottom:12px}
+.upload-tab{padding:6px 16px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid var(--bdr);background:transparent;color:var(--txt3);transition:all .2s}
+.upload-tab.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+.upload-panel{display:none}.upload-panel.active{display:block}
+textarea{width:100%;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;color:var(--txt);padding:10px 14px;font-family:'Inter',sans-serif;font-size:.8rem;resize:vertical;outline:none;transition:border-color .2s;min-height:90px}
+textarea:focus{border-color:var(--pri)}
+textarea::placeholder{color:var(--txt4)}
+input[type="file"]{display:none}
+.file-label{display:flex;align-items:center;gap:8px;padding:10px 20px;border:1px dashed var(--bdr);border-radius:10px;color:var(--txt3);font-size:.8rem;cursor:pointer;transition:all .2s;justify-content:center}
+.file-label:hover{border-color:var(--pri);color:var(--pri2)}
+.file-label.has-file{border-color:var(--grn);color:var(--grn);border-style:solid}
+select{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);padding:6px 10px;font-size:.78rem;outline:none;font-family:'Inter',sans-serif}
+
+/* Buttons */
+.btn{padding:8px 20px;border-radius:10px;font-weight:700;font-size:.8rem;border:1px solid var(--bdr);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(135deg,#0369a1,var(--pri));color:#fff;border:none}
+.btn-primary:hover{box-shadow:0 4px 20px rgba(14,165,233,.35)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-danger{background:transparent;color:var(--red);border-color:rgba(248,113,113,.3)}
+.btn-danger:hover{background:var(--red2)}
+.btn-ghost{background:transparent;color:var(--txt2)}
+.btn-ghost:hover{background:var(--bg4)}
+.btn-sm{padding:5px 12px;font-size:.72rem}
+.btn-success{background:transparent;color:var(--grn);border-color:rgba(74,222,128,.3)}
+.btn-success:hover{background:var(--grn2)}
+
+/* Controls */
+.controls{display:flex;align-items:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+.progress-wrap{flex:1;min-width:200px}
+.progress-bar{height:6px;background:var(--bg4);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pri),var(--pri2),var(--pri3));border-radius:999px;transition:width .3s;width:0%;position:relative}
+.progress-fill.active::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.progress-text{font-size:.72rem;color:var(--txt3);margin-top:4px;text-align:right}
+.current-domain{padding:8px 14px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--pri);font-size:.78rem;color:var(--txt2);margin:8px 0;display:none;align-items:center;gap:8px}
+.current-domain.show{display:flex}
+.pulse{width:8px;height:8px;background:var(--pri);border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(14,165,233,.4)}70%{box-shadow:0 0 0 6px rgba(14,165,233,0)}100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}}
+
+/* Stats */
+.stats-row{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap;justify-content:center}
+.stat{background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:10px 18px;text-align:center;min-width:80px;backdrop-filter:blur(8px);transition:all .25s}
+.stat:hover{border-color:var(--bdr2);transform:translateY(-3px);box-shadow:0 4px 16px var(--glow)}
+.stat-n{font-size:1.4rem;font-weight:800;color:var(--pri2)}
+.stat-l{font-size:.6rem;color:var(--txt3);margin-top:2px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+
+/* Weights */
+.weights{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.w-chip{background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:4px 12px;font-size:.66rem;color:var(--txt2);text-align:center;transition:all .2s}
+.w-chip:hover{border-color:var(--pri);transform:scale(1.05)}
+.w-chip span{display:block;font-size:.88rem;font-weight:700;color:var(--pri3)}
+
+/* Search */
+.search-wrap{margin:10px 0;position:relative}
+.search-wrap input{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;color:var(--txt);padding:8px 14px 8px 36px;font-size:.8rem;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--pri)}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.75rem}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap;justify-content:center}
+.tab{padding:5px 14px;border-radius:20px;font-size:.72rem;cursor:pointer;border:1px solid var(--bdr);background:transparent;color:var(--txt3);transition:all .25s;font-weight:500;user-select:none;font-family:'Inter',sans-serif}
+.tab:hover{border-color:var(--pri);color:var(--pri2);transform:translateY(-1px)}
+.tab.active{background:var(--pri);color:#fff;border-color:var(--pri)}
+
+/* Table */
+.table-wrap{border-radius:12px;border:1px solid var(--bdr);overflow-x:auto;max-height:65vh;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{background:var(--bg2);color:var(--pri3);padding:10px 8px;border-bottom:2px solid var(--bdr);font-weight:600;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2;cursor:pointer;user-select:none;transition:color .2s;font-size:.82rem}
+thead th:hover{color:var(--amb)}
+thead th .sa{font-size:.55rem;margin-left:3px;opacity:.4}
+thead th.sorted .sa{opacity:1;color:var(--amb)}
+tbody tr{border-bottom:1px solid rgba(21,28,40,.6);transition:background .15s;cursor:pointer}
+tbody tr:hover{background:rgba(14,165,233,.06)}
+tbody td{padding:8px 8px;text-align:center;vertical-align:middle}
+.td-d{font-family:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;font-size:.95rem;color:#f8fafc;text-align:left!important;white-space:nowrap;font-weight:500;letter-spacing:.02em;font-feature-settings:"calt" 0,"liga" 0;font-variant-ligatures:none;max-width:340px;overflow:hidden;text-overflow:ellipsis}
+.td-d>div{line-height:1.5;min-width:0}
+.td-d>div>span:not(.geo-badge):not(.b-badge){overflow:hidden;text-overflow:ellipsis}
+.sc{display:flex;align-items:center;gap:5px;justify-content:center}
+.sb{background:var(--bg4);border-radius:4px;height:7px;width:55px;overflow:hidden}
+.sf{height:100%;border-radius:4px;transition:width .3s}
+.sv{font-weight:700;font-size:.95rem;min-width:26px}
+
+/* Verdict tags */
+.dec-tag{font-size:.75rem;padding:3px 10px;border-radius:5px;font-weight:700;white-space:nowrap;display:inline-block}
+.dec-GEM{background:var(--gem3);color:var(--gem1);border:1px solid rgba(245,158,11,.3);animation:gemGlow 2s ease infinite}
+@keyframes gemGlow{0%,100%{box-shadow:0 0 4px rgba(245,158,11,.2)}50%{box-shadow:0 0 12px rgba(245,158,11,.4)}}
+.dec-BUY{background:var(--grn2);color:var(--grn)}
+.dec-HOLD{background:var(--hold2);color:var(--hold)}
+.dec-PASS{background:var(--bg4);color:var(--txt3)}
+
+/* Domain type badges */
+.dt-badge{font-size:.73rem;padding:2px 8px;border-radius:4px;font-weight:600;white-space:nowrap;display:inline-block}
+.dt-seo_keyword{background:rgba(14,165,233,.12);color:var(--pri2)}
+.dt-local_service{background:rgba(167,139,250,.12);color:var(--pur)}
+.dt-global_service{background:rgba(74,222,128,.12);color:var(--grn)}
+.dt-brandable{background:rgba(251,191,36,.12);color:var(--amb)}
+.dt-content_media{background:rgba(6,182,212,.12);color:var(--geo1)}
+.dt-low_value{background:var(--bg4);color:var(--txt4)}
+
+/* Speed badges */
+.speed-badge{font-size:.73rem;padding:2px 7px;border-radius:4px;font-weight:600;display:inline-block}
+.sp-Fast{background:rgba(74,222,128,.15);color:var(--grn)}
+.sp-Medium{background:rgba(251,191,36,.12);color:var(--amb)}
+.sp-Slow{background:var(--bg4);color:var(--txt4)}
+
+/* Niche tags */
+.nt{font-size:.62rem;padding:2px 8px;border-radius:5px;font-weight:600;white-space:nowrap;display:inline-block}
+.n-found{background:rgba(30,58,95,.5);color:var(--pri3)}
+.n-none{background:var(--bg4);color:var(--txt4)}
+
+/* Geo badge */
+.geo-badge{display:inline-block;background:var(--geo2);color:var(--geo1);font-size:.58rem;padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:600;border:1px solid rgba(6,182,212,.25)}
+
+/* Expanded row */
+.detail-row td{padding:0!important;border-bottom:1px solid var(--bdr)}
+.detail-content{background:var(--bg2);padding:14px 20px;border-left:3px solid var(--pri);margin:0;animation:slideDown .2s ease}
+@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:300px}}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:.74rem}
+.detail-label{color:var(--txt3);font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:2px}
+.detail-val{color:var(--txt);font-weight:500}
+.reasoning-text{color:var(--pri3);font-size:.76rem;line-height:1.5;margin-top:10px;padding:10px;background:rgba(14,165,233,.05);border-radius:8px;border:1px solid rgba(14,165,233,.1)}
+.price-tag{display:inline-block;background:rgba(74,222,128,.1);color:var(--grn);padding:2px 8px;border-radius:5px;font-weight:700;font-size:.78rem;border:1px solid rgba(74,222,128,.2)}
+
+/* Misc */
+.hi{color:var(--grn);font-weight:600}.dim{color:var(--txt4)}
+.ac{display:inline-block;padding:3px 8px;border-radius:5px;font-size:.78rem;font-weight:600}
+.a-hi{background:var(--grn2);color:var(--grn)}.a-mid{background:rgba(30,58,95,.5);color:var(--pri3)}.a-lo{background:var(--bg4);color:var(--txt3)}
+.rk1{color:var(--amb);font-size:1rem;font-weight:700}
+.rk2{color:var(--txt2);font-size:1rem;font-weight:700}
+.rk3{color:#b45309;font-size:1rem;font-weight:700}
+.rkn{color:var(--txt4);font-weight:600;font-size:.78rem}
+.empty-msg{text-align:center;color:var(--txt4);padding:50px;font-size:.85rem}
+
+/* Excluded */
+.export-row{display:flex;gap:10px;margin:14px 0;justify-content:center;flex-wrap:wrap}
+.ex-cols{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.ex-col{flex:1;min-width:200px}
+.ex-title{color:var(--pri3);font-size:.75rem;font-weight:700;margin-bottom:6px}
+.ex-count{font-size:.65rem;color:var(--txt4);font-weight:400}
+.ex-item{font-family:'JetBrains Mono','SF Mono','Menlo','Consolas',monospace;font-size:.74rem;color:var(--txt2);background:var(--bg2);padding:4px 10px;border-radius:6px;display:inline-block;margin:2px;border:1px solid var(--bdr);letter-spacing:.02em;font-weight:500}
+
+/* Brandable */
+:root{--brand:#c084fc;--brand2:rgba(192,132,252,.15);--brand3:rgba(192,132,252,.25)}
+.tab-brandable.active{background:linear-gradient(135deg,#7c3aed,#a78bfa)!important;border-color:#a78bfa!important}
+.b-score-wrap{display:flex;align-items:center;gap:5px;justify-content:center}
+.b-score-val{font-weight:800;font-size:.95rem;color:var(--brand)}
+.b-score-bar{background:var(--bg4);border-radius:4px;height:7px;width:55px;overflow:hidden}
+.b-score-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#7c3aed,#c084fc)}
+.b-badge{display:inline-block;background:var(--brand2);color:var(--brand);font-size:.62rem;padding:1px 6px;border-radius:4px;font-weight:700;border:1px solid var(--brand3);margin-left:4px;vertical-align:middle}
+.b-rank{color:var(--brand);font-weight:700;font-size:.88rem}
+.ba-cell{display:inline-block;padding:2px 6px;border-radius:4px;font-size:.75rem;font-weight:600;background:var(--bg4);color:var(--txt3)}
+.ba-hi{background:rgba(192,132,252,.15);color:var(--brand)}
+.ba-mid{background:rgba(129,140,248,.12);color:var(--hold)}
+.ba-lo{background:var(--bg4);color:var(--txt4)}
+.brand-reasoning{color:var(--brand);font-size:.76rem;line-height:1.5;margin-top:10px;padding:10px;background:rgba(192,132,252,.05);border-radius:8px;border:1px solid rgba(192,132,252,.12)}
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 24px;border-radius:10px;font-size:.82rem;font-weight:500;transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.68,-.55,.27,1.55);z-index:999;backdrop-filter:blur(12px);font-family:'Inter',sans-serif;max-width:380px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-success{background:rgba(20,83,45,.92);color:var(--grn);border:1px solid rgba(74,222,128,.3)}
+.toast-error{background:rgba(59,31,31,.92);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+.toast-info{background:rgba(30,58,95,.92);color:var(--pri3);border:1px solid rgba(56,189,248,.3)}
+
+/* Action Buttons */
+.act-btns{display:flex;gap:5px;align-items:center}
+.act-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--bdr);background:rgba(15,23,42,.6);cursor:pointer;transition:all .2s;font-size:.9rem;color:var(--txt3)}
+.act-btn:hover{border-color:var(--pri);color:var(--pri2);background:var(--bg4);transform:translateY(-1px);box-shadow:0 0 10px var(--glow)}
+.act-btn-copy:hover{border-color:var(--grn);color:var(--grn)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:1000}
+.modal-overlay.show{display:flex}
+.modal-content{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;width:95%;max-width:680px;max-height:85vh;overflow-y:auto;position:relative;animation:modalIn .3s cubic-bezier(.34,1.56,.64,1);box-shadow:0 30px 60px -12px rgba(0,0,0,0.6);direction:rtl;text-align:right;font-family:'Inter',sans-serif}
+@keyframes modalIn{from{transform:scale(.95) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-h{padding:20px 24px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;background:rgba(15,23,42,.4)}
+.modal-t{font-size:1.1rem;font-weight:900;background:linear-gradient(135deg,var(--pri2),var(--pri3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.modal-x{cursor:pointer;color:var(--txt4);font-size:1.4rem;transition:color .2s;line-height:1}
+.modal-x:hover{color:var(--red)}
+.modal-b{padding:24px}
+.m-sec{margin-bottom:20px;padding-right:12px;border-right:3px solid var(--bdr)}
+.m-sec.pri{border-right-color:var(--pri)}
+.m-lab{color:var(--txt3);font-size:.65rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em}
+.m-val{color:var(--txt);line-height:1.6;font-size:1rem;font-weight:500}
+.m-reason{background:rgba(14,165,233,.05);border:1px solid rgba(14,165,233,.12);border-radius:12px;padding:16px;color:var(--pri3);font-size:.92rem;line-height:1.7}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px}
+.m-card{background:var(--bg4);border:1px solid var(--bdr);border-radius:10px;padding:12px}
+
+@media(max-width:768px){.container{padding:12px}.stats-row{gap:6px}.stat{min-width:65px;padding:8px 8px}.stat-n{font-size:1rem}.detail-grid{grid-template-columns:1fr 1fr}.m-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>◆ Domain Value Analyzer — V4</h1>
+<p class="sub">Market Intelligence — "Can this domain be sold for profit?"</p>
+<span class="version">V4 — INVESTOR LOGIC · 6 MARKET AXES</span>
+</div>
+
+<div class="card" id="upload-card">
+<div class="card-title" onclick="toggleUpload()"><span id="ua">▼</span> DATA INPUT <span id="qc" style="color:var(--txt3);font-weight:400;font-size:.65rem;letter-spacing:0"></span></div>
+<div id="ub">
+<div class="upload-tabs">
+<div class="upload-tab active" onclick="showUT('paste',this)">Paste</div>
+<div class="upload-tab" onclick="showUT('txt',this)">Upload TXT</div>
+<div class="upload-tab" onclick="showUT('csv',this)">Upload CSV</div>
+</div>
+<div class="upload-panel active" id="p-paste">
+<textarea id="ta" placeholder="domain1.com&#10;domain2.net&#10;domain3.io" rows="4"></textarea>
+<div style="margin-top:8px;text-align:right"><button class="btn btn-primary" onclick="addPaste()">➕ Add to Queue</button></div>
+</div>
+<div class="upload-panel" id="p-txt">
+<label class="file-label" id="tl" for="ti">📄 Click to select .txt file</label>
+<input type="file" id="ti" accept=".txt" onchange="onTxt(this)">
+<div style="margin-top:8px;text-align:right"><button class="btn btn-primary" id="bt" onclick="loadTxt()" disabled>📤 Load TXT</button></div>
+</div>
+<div class="upload-panel" id="p-csv">
+<label class="file-label" id="cl" for="ci">📄 Click to select .csv files (multiple allowed)</label>
+<input type="file" id="ci" accept=".csv" multiple onchange="onCsv(this)">
+<div id="csv-files-list" style="display:none;margin-top:8px"></div>
+<div id="cp" style="display:none;margin-top:8px">
+<label style="font-size:.75rem;color:var(--txt2)">Domain Column: </label>
+<select id="cs"></select>
+</div>
+<div id="csv-headers-preview" style="display:none;margin-top:10px"></div>
+<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+<span id="csv-status" style="font-size:.72rem;color:var(--txt3)"></span>
+<button class="btn btn-primary" id="bc" onclick="loadAllCsvs()" disabled>📤 Load All CSV Files</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="controls">
+<button class="btn btn-primary" id="btnS" onclick="startA()">▶ Start</button>
+<button class="btn btn-danger" id="btnP" onclick="stopA()" disabled>■ Stop</button>
+<button class="btn btn-ghost" onclick="resetA()">↺ Reset</button>
+<div class="progress-wrap">
+<div class="progress-bar"><div class="progress-fill" id="pf"></div></div>
+<div class="progress-text" id="pt">0 / 0</div>
+</div>
+</div>
+<div class="current-domain" id="cd"><span class="pulse"></span><span id="cdt"></span></div>
+
+<div class="stats-row">
+<div class="stat"><div class="stat-n" id="sp">0/0</div><div class="stat-l">Progress</div></div>
+<div class="stat"><div class="stat-n" id="ss" style="color:var(--grn)">0</div><div class="stat-l">Scored</div></div>
+<div class="stat"><div class="stat-n" id="sk" style="color:var(--amb)">0</div><div class="stat-l">Peak</div></div>
+<div class="stat"><div class="stat-n" id="sg" style="color:var(--gem1)">0</div><div class="stat-l">💎 Gem</div></div>
+<div class="stat"><div class="stat-n" id="sb" style="color:var(--grn)">0</div><div class="stat-l">Buy</div></div>
+<div class="stat"><div class="stat-n" id="sh" style="color:var(--hold)">0</div><div class="stat-l">Hold</div></div>
+<div class="stat"><div class="stat-n" id="sf" style="color:var(--geo1)">0</div><div class="stat-l">⚡ Fast</div></div>
+<div class="stat"><div class="stat-n" id="sbd" style="color:var(--brand)">0</div><div class="stat-l">✨ Brand</div></div>
+<div class="stat"><div class="stat-n" id="se" style="color:var(--red)">0</div><div class="stat-l">Excluded</div></div>
+</div>
+
+<div class="weights">
+<div class="w-chip"><span>25</span>💰 Intent</div>
+<div class="w-chip"><span>20</span>📈 Demand</div>
+<div class="w-chip"><span>15</span>🎯 Clarity</div>
+<div class="w-chip"><span>15</span>🧩 Buyers</div>
+<div class="w-chip"><span>15</span>🌍 Geo+Niche</div>
+<div class="w-chip"><span>10</span>⚡ Liquidity</div>
+</div>
+
+<div class="search-wrap"><input type="text" id="si" placeholder="Search domains, niches, verdicts, types..." oninput="onSrch()"></div>
+
+<div class="tabs">
+<div class="tab active" onclick="sTab('all',this)">All</div>
+<div class="tab" onclick="sTab('gem',this)">💎 GEM</div>
+<div class="tab" onclick="sTab('buy',this)">✅ BUY</div>
+<div class="tab" onclick="sTab('hold',this)">⏳ HOLD</div>
+<div class="tab" onclick="sTab('pass',this)">❌ PASS</div>
+<div class="tab" onclick="sTab('geo',this)">📍 Geo</div>
+<div class="tab" onclick="sTab('fast',this)">⚡ Fast Flip</div>
+<div class="tab tab-brandable" onclick="sTab('brandable',this)">✨ Brandable</div>
+<div class="tab" onclick="sTab('excluded',this)">Excluded</div>
+</div>
+
+<div id="ta-area">
+<div class="table-wrap">
+<table><thead><tr>
+<th>#</th>
+<th data-c="domain" onclick="sortBy('domain')">Domain <span class="sa">▼</span></th>
+<th data-c="verdict" onclick="sortBy('verdict')">Verdict <span class="sa">▼</span></th>
+<th data-c="domain_type" onclick="sortBy('domain_type')">Type <span class="sa">▼</span></th>
+<th data-c="brandable_score" onclick="sortBy('brandable_score')">Brand <span class="sa">▼</span></th>
+<th class="sorted" data-c="total_score" onclick="sortBy('total_score')">Score <span class="sa">▼</span></th>
+<th data-c="commercial_intent" onclick="sortBy('commercial_intent')">Intent <span class="sa">▼</span></th>
+<th data-c="market_demand" onclick="sortBy('market_demand')">Demand <span class="sa">▼</span></th>
+<th data-c="clarity" onclick="sortBy('clarity')">Clarity <span class="sa">▼</span></th>
+<th data-c="buyer_pool" onclick="sortBy('buyer_pool')">Buyers <span class="sa">▼</span></th>
+<th data-c="geo_niche" onclick="sortBy('geo_niche')">Geo+N <span class="sa">▼</span></th>
+<th data-c="resell_speed" onclick="sortBy('resell_speed')">Speed <span class="sa">▼</span></th>
+</tr></thead>
+<tbody id="rb"></tbody>
+</table>
+</div>
+<div id="pg" style="text-align:center;padding:10px 0;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap"></div>
+</div>
+
+<div id="ex-area" style="display:none">
+<div class="ex-cols">
+<div class="ex-col"><div class="ex-title">🛡 Trademark <span class="ex-count" id="etc">(0)</span></div><div id="et"></div></div>
+<div class="ex-col"><div class="ex-title">🚫 Hard Filter <span class="ex-count" id="ehc">(0)</span></div><div id="eh"></div></div>
+<div class="ex-col"><div class="ex-title">🔤 Gibberish <span class="ex-count" id="egc">(0)</span></div><div id="eg"></div></div>
+</div>
+</div>
+
+<div class="export-row">
+<button class="btn btn-success btn-sm" onclick="location='/api/export/all'">📥 Export All CSV</button>
+<button class="btn btn-success btn-sm" onclick="location='/api/export/buy'">📥 Export GEM + BUY</button>
+<button class="btn btn-sm" style="background:var(--brand2);color:var(--brand);border-color:var(--brand3)" onclick="location='/api/export/brandable'">✨ Export Brandable CSV</button>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="mo" onclick="if(event.target===this)closeModal()">
+<div class="modal-content">
+<div class="modal-h">
+<div class="modal-t" id="mt">تفاصيل النطاق</div>
+<div class="modal-x" onclick="closeModal()">×</div>
+</div>
+<div class="modal-b" id="mb">
+<!-- Content via JS -->
+</div>
+</div>
+</div>
+
+<script>
+let R=[],eTm=[],eHd=[],eGb=[];
+let cTab='all',sCol='total_score',sAsc=false,sq='';
+let es=null,running=false;
+let S={ci:0,td:0,ts:0,hi:0,gc:0,bc:0,hc:0,geo:0,fc:0,bdc:0};
+let curPage=0;const PG_SIZE=200;
+let _sseCount=0;let _srchTimer=null;
+let expandedDomain=null;
+
+function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escBreaks(s){return esc(s).replace(/\. /g,'.<br>');}
+
+async function init(){await loadSt();await loadR();renderAll();}
+
+async function loadSt(){
+try{const r=await fetch('/api/state');const d=await r.json();
+S.ci=d.current_index||0;S.td=d.total_domains||0;S.ts=d.total_scored||0;
+S.hi=d.highest||0;S.gc=d.gem_count||0;S.bc=d.buy_count||0;S.hc=d.hold_count||0;
+S.geo=d.geo_count||0;S.fc=d.fast_count||0;S.bdc=d.brandable_count||0;
+eTm=d.excluded_tm||[];eHd=d.excluded_hd||[];eGb=d.excluded_gb||[];
+running=d.is_running||false;}catch(e){}}
+
+async function loadR(){
+try{const r=await fetch('/api/results');R=await r.json();}catch(e){R=[];}}
+
+function toggleUpload(){const b=document.getElementById('ub'),a=document.getElementById('ua');
+if(b.style.display==='none'){b.style.display='block';a.textContent='▼';}else{b.style.display='none';a.textContent='▶';}}
+
+function showUT(t,el){document.querySelectorAll('.upload-tab').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.upload-panel').forEach(x=>x.classList.remove('active'));
+el.classList.add('active');document.getElementById('p-'+t).classList.add('active');}
+
+async function addPaste(){
+const t=document.getElementById('ta').value.trim();if(!t)return;
+const ds=t.split(/[\n\r\t, ]+/).map(d=>d.trim()).filter(d=>d);
+if(!ds.length){toast('No valid domains','error');return;}
+let add=0,dup=0,tot=0,err=false;
+const chk=5000;
+const ta=document.getElementById('ta');
+ta.disabled=true;
+for(let i=0;i<ds.length;i+=chk){
+try{
+const r=await fetch('/api/domains',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domains:ds.slice(i,i+chk)})});
+const d=await r.json();
+if(d.added!==undefined){add+=d.added;dup+=(d.duplicates_skipped||0);tot=d.total;}
+else{err=true;toast(d.error||'Error','error');break;}
+}catch(e){err=true;toast('Connection error','error');break;}
+}
+ta.disabled=false;
+if(!err||add>0){
+let msg='✅ '+add+' domains queued ('+tot+' total)';
+if(dup>0)msg+=' — '+dup+' duplicates skipped';
+toast(msg);ta.value='';S.td=tot;renderSt();
+}
+}
+
+function onTxt(i){if(i.files.length){document.getElementById('tl').textContent='📄 '+i.files[0].name;
+document.getElementById('tl').classList.add('has-file');document.getElementById('bt').disabled=false;}}
+
+async function loadTxt(){const f=document.getElementById('ti').files[0];if(!f)return;
+const t=await f.text();const ds=t.split(/[\n\r\t, ]+/).map(d=>d.trim()).filter(d=>d);
+if(!ds.length){toast('No valid domains in TXT','error');return;}
+let add=0,dup=0,tot=0,err=false;
+const chk=5000;
+document.getElementById('bt').disabled=true;
+for(let i=0;i<ds.length;i+=chk){
+try{
+const r=await fetch('/api/domains',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domains:ds.slice(i,i+chk)})});
+const d=await r.json();
+if(d.added!==undefined){add+=d.added;dup+=(d.duplicates_skipped||0);tot=d.total;}
+else{err=true;toast(d.error||'Error','error');break;}
+}catch(e){err=true;toast('Error loading TXT','error');break;}
+}
+document.getElementById('bt').disabled=false;
+if(!err||add>0){
+let msg='✅ '+add+' from TXT';
+if(dup>0)msg+=' — '+dup+' dupes skipped';
+toast(msg);S.td=tot;renderSt();
+}
+}
+
+let csvFiles=[];
+let csvParsedHeaders=[];
+
+// Known column mappings for display
+const COL_MAP_INFO={
+  cpc:{icon:'💰',label:'CPC',desc:'Cost Per Click — boosts Commercial Intent score'},
+  dp:{icon:'📊',label:'DP',desc:'Domain Popularity'},
+  bl:{icon:'🔗',label:'BL',desc:'Backlinks'},
+  aby:{icon:'📅',label:'ABY',desc:'Domain Birth Year — affects Age scoring'},
+  wby:{icon:'📅',label:'WBY',desc:'WHOIS Birth Year'},
+  acr:{icon:'📁',label:'ACR',desc:'Archive Count — historical activity'},
+  rdt:{icon:'↪️',label:'RDT',desc:'Redirect status'},
+  reg:{icon:'🌐',label:'REG',desc:'Registered TLD variants — boosts Market Demand & Buyer Pool'},
+  le:{icon:'📏',label:'LE',desc:'Length'},
+  sv:{icon:'🔍',label:'SG/SV',desc:'Monthly Search Volume — boosts Market Demand score'},
+};
+
+function onCsv(i){
+  if(!i.files.length)return;
+  csvFiles=Array.from(i.files);
+  const lbl=document.getElementById('cl');
+  if(csvFiles.length===1){
+    lbl.textContent='📄 '+csvFiles[0].name;
+  }else{
+    lbl.textContent='📄 '+csvFiles.length+' CSV files selected';
+  }
+  lbl.classList.add('has-file');
+
+  // Show file list
+  const listEl=document.getElementById('csv-files-list');
+  if(csvFiles.length>1){
+    listEl.style.display='block';
+    listEl.innerHTML=csvFiles.map((f,idx)=>
+      '<div style="font-size:.72rem;color:var(--txt2);padding:2px 0">'+
+      '<span style="color:var(--pri2);font-weight:600">'+(idx+1)+'.</span> '+f.name+
+      ' <span style="color:var(--txt4)">('+formatSize(f.size)+')</span></div>'
+    ).join('');
+  }else{listEl.style.display='none';}
+
+  // Read first file headers to detect columns
+  const rd=new FileReader();
+  rd.onload=function(e){
+    let txt=e.target.result;
+    if(txt.charCodeAt(0)===0xFEFF)txt=txt.slice(1);
+    const ls=txt.split('\n');
+    if(ls.length>0){
+      const cols=ls[0].split(',').map(c=>c.trim().replace(/^"+|"+$/g,'').replace(/^'+|'+$/g,''));
+      csvParsedHeaders=cols;
+      const sel=document.getElementById('cs');
+      sel.innerHTML=cols.map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+      for(const c of cols){if(['domain','name','domains','url'].includes(c.toLowerCase())){sel.value=c;break;}}
+      document.getElementById('cp').style.display='block';
+      document.getElementById('bc').disabled=false;
+      showHeadersPreview(cols);
+    }
+  };
+  rd.readAsText(csvFiles[0],'utf-8');
+}
+
+function formatSize(bytes){
+  if(bytes<1024)return bytes+' B';
+  if(bytes<1024*1024)return (bytes/1024).toFixed(1)+' KB';
+  return (bytes/(1024*1024)).toFixed(1)+' MB';
+}
+
+function showHeadersPreview(cols){
+  const preview=document.getElementById('csv-headers-preview');
+  // Detect which columns map to scoring features
+  const mappings=[];
+  const known_map={
+    cpc:'cpc', dp:'dp', bl:'bl', aby:'aby', birth:'aby',
+    wby:'wby', acr:'acr', rdt:'rdt', redirect:'rdt',
+    reg:'reg', le:'le', sv:'sv', sg:'sv',
+    'search volume':'sv', 'exact search':'sv', lms:'sv', gms:'sv'
+  };
+  const detected={};
+  for(const c of cols){
+    const cl=c.trim().toLowerCase();
+    if(known_map[cl]){
+      const key=known_map[cl];
+      if(!detected[key])detected[key]=c;
+    }
+  }
+
+  let html='<div style="font-size:.72rem;color:var(--pri3);font-weight:600;margin-bottom:6px">📋 Detected Column Mapping</div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+
+  // Show all headers with mapping status
+  for(const c of cols){
+    const cl=c.trim().toLowerCase();
+    const mapKey=known_map[cl];
+    if(mapKey && COL_MAP_INFO[mapKey]){
+      const info=COL_MAP_INFO[mapKey];
+      html+='<div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:6px;padding:3px 10px;font-size:.68rem;color:var(--grn)" title="'+info.desc+'">'
+        +info.icon+' <strong>'+c+'</strong> → '+info.label+'</div>';
+    }else if(['domain','name','domains','url','website'].includes(cl)){
+      html+='<div style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);border-radius:6px;padding:3px 10px;font-size:.68rem;color:var(--pri2)" title="Domain column">'
+        +'🌐 <strong>'+c+'</strong> → Domain</div>';
+    }else{
+      html+='<div style="background:var(--bg4);border:1px solid var(--bdr);border-radius:6px;padding:3px 10px;font-size:.68rem;color:var(--txt4)" title="Not mapped to scoring">'
+        +c+' <span style="opacity:.5">(unused)</span></div>';
+    }
+  }
+  html+='</div>';
+
+  // Summary of what will be used
+  const detKeys=Object.keys(detected);
+  if(detKeys.length>0){
+    html+='<div style="margin-top:8px;padding:8px 12px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.15);border-radius:8px;font-size:.72rem;color:var(--grn)">';
+    html+='✅ <strong>'+detKeys.length+' data columns</strong> detected — will be used in scoring: ';
+    html+=detKeys.map(k=>{const info=COL_MAP_INFO[k];return info?info.icon+' '+info.label:k;}).join(', ');
+    if(detected.sv)html+='<br><span style="color:var(--pri3)">🔍 Search Volume (SG) will boost Market Demand axis (+0-10 pts)</span>';
+    if(detected.reg)html+='<br><span style="color:var(--pri3)">🌐 Registered TLDs (REG) will boost Market Demand (+0-3 pts) & Buyer Pool (+0-2 pts)</span>';
+    html+='</div>';
+  }else{
+    html+='<div style="margin-top:8px;padding:8px 12px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:8px;font-size:.72rem;color:var(--amb)">';
+    html+='⚠️ No data columns detected — only domain names will be processed (basic scoring)</div>';
+  }
+
+  preview.style.display='block';
+  preview.innerHTML=html;
+  document.getElementById('csv-status').textContent=csvFiles.length+' file(s) ready • '+cols.length+' columns detected';
+}
+
+async function loadAllCsvs(){
+  if(!csvFiles.length)return;
+  const col=document.getElementById('cs').value;
+  const btn=document.getElementById('bc');
+  btn.disabled=true;btn.textContent='⏳ Uploading...';
+  let totalAdded=0,totalDupes=0,totalEnriched=0,allDetected=new Set();
+
+  for(let idx=0;idx<csvFiles.length;idx++){
+    const f=csvFiles[idx];
+    const fd=new FormData();
+    fd.append('file',f);
+    fd.append('domain_column',col);
+    try{
+      const r=await fetch('/api/upload/csv',{method:'POST',body:fd});
+      if(r.status===413){toast('❌ '+f.name+' too large (max 100 MB)','error');continue;}
+      const d=await r.json();
+      if(d.added!==undefined){
+        totalAdded+=d.added;
+        totalDupes+=(d.duplicates_skipped||0);
+        totalEnriched+=(d.enriched||0);
+        if(d.detected)d.detected.forEach(x=>allDetected.add(x));
+        S.td=d.total;
+        if(csvFiles.length>1){
+          document.getElementById('csv-status').textContent='Uploaded '+(idx+1)+'/'+csvFiles.length+': '+f.name;
+        }
+      }else{
+        toast('❌ Error in '+f.name+': '+(d.error||'Unknown'),'error');
+      }
+    }catch(e){
+      toast('❌ Upload failed for '+f.name,'error');
+    }
+  }
+
+  btn.disabled=false;btn.textContent='📤 Load All CSV Files';
+  let m='✅ '+totalAdded+' domains from '+csvFiles.length+' file(s)';
+  if(totalDupes>0)m+=' ('+totalDupes+' dupes skipped)';
+  if(totalEnriched>0)m+=' | +'+totalEnriched+' enriched';
+  if(allDetected.size>0)m+=' | Data: '+[...allDetected].join(', ').toUpperCase();
+  toast(m);
+  renderSt();
+}
+
+async function startA(){
+if(running||S.td===0)return;
+// Pre-check server state — prevents racing the 409 from EventSource
+try{const stRes=await fetch('/api/state');const st=await stRes.json();
+if(st.is_running){toast('⚠️ تحليل قيد التشغيل بالفعل — انتظر الانتهاء أو اضغط Stop','error');return;}
+}catch(e){}
+running=true;updBtn();_sseCount=0;
+document.getElementById('cd').classList.add('show');
+es=new EventSource('/api/start');
+es.onmessage=function(e){const d=JSON.parse(e.data);
+if(d.type==='progress'){S.ci=d.index;updProg(d.index,d.total,d.domain);
+if(d.result_type==='scored'&&d.result){d.result.rank=R.length+1;R.push(d.result);
+S.ts++;if(d.result.total_score>S.hi)S.hi=d.result.total_score;
+if(d.result.verdict==='GEM')S.gc++;
+if(d.result.verdict==='BUY')S.bc++;if(d.result.verdict==='HOLD')S.hc++;
+if(d.result.is_geo)S.geo++;if(d.result.resell_speed==='Fast')S.fc++;
+if(d.result.is_brandable)S.bdc++;
+if(d.is_excluded){
+    if(d.exclude_reason==='trademark')eTm.push(d.domain);
+    else if(d.exclude_reason==='hard')eHd.push(d.domain);
+    else eGb.push(d.domain);
+}
+_sseCount++;if(_sseCount%50===0)renderTbl();}
+else if(d.result_type==='excluded'){
+if(d.exclude_reason==='trademark')eTm.push(d.domain);
+else if(d.exclude_reason==='hard')eHd.push(d.domain);
+else eGb.push(d.domain);}
+else if(d.result_type==='error')eGb.push(d.domain+' (error)');
+renderSt();}
+else if(d.type==='complete'){running=false;updBtn();
+document.getElementById('cd').classList.remove('show');
+document.getElementById('pf').classList.remove('active');
+renderTbl();toast('✅ Analysis Complete!');}};
+es.onerror=function(){
+  // EventSource fires onerror on both 409 (already running) and connection drops.
+  // Re-sync from server state to give the user a clear status.
+  if(es){es.close();es=null;}
+  fetch('/api/state').then(r=>r.json()).then(st=>{
+    running=!!st.is_running;updBtn();
+    if(!running){document.getElementById('cd').classList.remove('show');document.getElementById('pf').classList.remove('active');}
+    renderTbl();
+  }).catch(()=>{running=false;updBtn();document.getElementById('cd').classList.remove('show');renderTbl();});
+};}
+
+async function stopA(){try{await fetch('/api/stop',{method:'POST'});}catch(e){}
+if(es){es.close();es=null;}running=false;updBtn();
+document.getElementById('cd').classList.remove('show');
+document.getElementById('pf').classList.remove('active');renderTbl();toast('⏸ Stopped','info');}
+
+async function resetA(){if(!confirm('Reset all data?'))return;
+try{await fetch('/api/reset',{method:'POST'});}catch(e){}
+if(es){es.close();es=null;}R=[];eTm=[];eHd=[];eGb=[];
+S={ci:0,td:0,ts:0,hi:0,gc:0,bc:0,hc:0,geo:0,fc:0,bdc:0};running=false;curPage=0;expandedDomain=null;updBtn();renderAll();
+document.getElementById('cd').classList.remove('show');toast('↺ Reset','info');}
+
+function updBtn(){document.getElementById('btnS').disabled=running;document.getElementById('btnP').disabled=!running;}
+
+function updProg(i,t,d){const p=t>0?Math.round(i/t*100):0;const pf=document.getElementById('pf');
+pf.style.width=p+'%';pf.classList.add('active');
+document.getElementById('pt').textContent=i+' / '+t+' ('+p+'%)';
+document.getElementById('cdt').innerHTML='Analyzing <strong style="color:var(--pri3);font-family:\'JetBrains Mono\',\'SF Mono\',\'Menlo\',monospace;letter-spacing:.02em;font-size:.86rem">'+esc(d)+'</strong> — '+i+'/'+t;}
+
+function renderAll(){renderSt();renderTbl();renderEx();}
+
+function renderSt(){document.getElementById('sp').textContent=S.ci+'/'+S.td;
+document.getElementById('ss').textContent=S.ts;document.getElementById('sk').textContent=S.hi;
+document.getElementById('sg').textContent=S.gc;
+document.getElementById('sb').textContent=S.bc;document.getElementById('sh').textContent=S.hc;
+document.getElementById('sf').textContent=S.fc;
+document.getElementById('sbd').textContent=S.bdc;
+document.getElementById('se').textContent=eTm.length+eHd.length+eGb.length;
+const p=S.td>0?Math.round(S.ci/S.td*100):0;
+document.getElementById('pf').style.width=p+'%';
+document.getElementById('pt').textContent=S.ci+' / '+S.td;
+document.getElementById('qc').textContent=S.td>0?'('+S.td+' in queue)':'';}
+
+function getF(){let d=[...R];
+if(cTab==='gem')d=d.filter(x=>x.verdict==='GEM');
+else if(cTab==='buy')d=d.filter(x=>x.verdict==='BUY');
+else if(cTab==='hold')d=d.filter(x=>x.verdict==='HOLD');
+else if(cTab==='pass')d=d.filter(x=>x.verdict==='PASS');
+else if(cTab==='geo')d=d.filter(x=>x.is_geo);
+else if(cTab==='fast')d=d.filter(x=>x.resell_speed==='Fast');
+else if(cTab==='brandable')d=d.filter(x=>x.is_brandable);
+// Verdict and resell_speed are categorical — sort by VALUE order, not alphabetic
+const VERDICT_ORDER={'GEM':0,'BUY':1,'HOLD':2,'PASS':3};
+const SPEED_ORDER={'Fast':0,'Medium':1,'Slow':2};
+d.sort((a,b)=>{let va=a[sCol],vb=b[sCol];
+if(sCol==='verdict'){const ra=VERDICT_ORDER[va]??99,rb=VERDICT_ORDER[vb]??99;return sAsc?ra-rb:rb-ra;}
+if(sCol==='resell_speed'){const ra=SPEED_ORDER[va]??99,rb=SPEED_ORDER[vb]??99;return sAsc?ra-rb:rb-ra;}
+if(typeof va==='string')return sAsc?va.localeCompare(vb):vb.localeCompare(va);
+return sAsc?va-vb:vb-va;});
+if(sq){const q=sq.toLowerCase();d=d.filter(x=>x.domain.includes(q)||(x.niche||'').toLowerCase().includes(q)||(x.verdict||'').toLowerCase().includes(q)||(x.domain_type||'').toLowerCase().includes(q)||(x.geo_name||'').toLowerCase().includes(q)||(x.target_buyer||'').toLowerCase().includes(q));}
+return d;}
+
+function dtLabel(t){
+const m={'seo_keyword':'🔍 SEO','local_service':'📍 Local','global_service':'🌐 Global','brandable':'🏷️ Brand','content_media':'📰 Content','low_value':'⚪ Low'};
+return m[t]||t;}
+
+function _mkCell(v,mx){const pct=mx>0?Math.round(v/mx*100):0;return v>0?(pct>=70?'<span class="ac a-hi">'+v+'</span>':pct>=40?'<span class="ac a-mid">'+v+'</span>':'<span class="ac a-lo">'+v+'</span>'):'<span class="dim">-</span>';}
+function _mkBaCell(v,mx){const pct=mx>0?Math.round(v/mx*100):0;return v>0?(pct>=70?'<span class="ba-cell ba-hi">'+v+'</span>':pct>=40?'<span class="ba-cell ba-mid">'+v+'</span>':'<span class="ba-cell ba-lo">'+v+'</span>'):'<span class="dim">-</span>';}
+
+function renderTbl(){
+const allData=getF();const tb=document.getElementById('rb');
+const isBrand=cTab==='brandable';
+const colCount=isBrand?10:15;
+const totalItems=allData.length;const totalPages=Math.ceil(totalItems/PG_SIZE)||1;
+if(curPage>=totalPages)curPage=totalPages-1;if(curPage<0)curPage=0;
+const start=curPage*PG_SIZE;const pageData=allData.slice(start,start+PG_SIZE);
+
+// Update thead
+const thead=document.querySelector('table thead tr');
+if(isBrand){
+thead.innerHTML='<th>#</th><th data-c="domain" onclick="sortBy(\'domain\')">Domain <span class="sa">▼</span></th><th data-c="brandable_score" onclick="sortBy(\'brandable_score\')" class="sorted">✨ B.Score <span class="sa">▼</span></th><th data-c="verdict" onclick="sortBy(\'verdict\')">Verdict <span class="sa">▼</span></th><th data-c="domain_type" onclick="sortBy(\'domain_type\')">Type <span class="sa">▼</span></th><th>Length</th><th>Pronounce</th><th>Memory</th><th>Pattern</th><th>Letters</th>';
+}else{
+const mlSorted=sCol==='ml_investment_score'?'class="sorted"':'';
+const mlSortAttr=mlSorted?'data-c="ml_investment_score" onclick="sortBy(\'ml_investment_score\')"':'';
+const priceSorted=sCol==='ml_price_estimate'?'class="sorted"':'';
+const priceSortAttr=priceSorted?'data-c="ml_price_estimate" onclick="sortBy(\'ml_price_estimate\')"':'';
+const mlHead='<th '+(mlSortAttr||'')+' '+(mlSorted||'')+' title="ML investment confidence from comparable sales">🤖 ML <span class="sa">▼</span></th>';
+const priceHead='<th '+(priceSortAttr||'')+' '+(priceSorted||'')+' title="ML estimated resale price">ML $ <span class="sa">▼</span></th>';
+// Simpler headers: keep sortable by default
+const _mlHead='<th data-c="ml_investment_score" onclick="sortBy(\'ml_investment_score\')" title="ML investment confidence from comparable sales" '+(sCol==='ml_investment_score'?'class="sorted"':'')+'>🤖 ML <span class="sa">▼</span></th>';
+const _priceHead='<th data-c="ml_price_estimate" onclick="sortBy(\'ml_price_estimate\')" title="ML estimated resale price" '+(sCol==='ml_price_estimate'?'class="sorted"':'')+'>ML $ <span class="sa">▼</span></th>';
+thead.innerHTML='<th>#</th><th data-c="domain" onclick="sortBy(\'domain\')">Domain <span class="sa">▼</span></th><th data-c="verdict" onclick="sortBy(\'verdict\')">Verdict <span class="sa">▼</span></th><th data-c="domain_type" onclick="sortBy(\'domain_type\')">Type <span class="sa">▼</span></th><th '+(sCol==='brandable_score'?'class="sorted"':'')+' data-c="brandable_score" onclick="sortBy(\'brandable_score\')">Brand <span class="sa">▼</span></th><th '+(sCol==='total_score'?'class="sorted"':'')+' data-c="total_score" onclick="sortBy(\'total_score\')">Score <span class="sa">▼</span></th><th data-c="kps_score" onclick="sortBy(\'kps_score\')" title="Keyword Power Score — based on real domain sale transactions">⚡ KPS <span class="sa">▼</span></th>'+_mlHead+_priceHead+'<th data-c="commercial_intent" onclick="sortBy(\'commercial_intent\')">Intent <span class="sa">▼</span></th><th data-c="market_demand" onclick="sortBy(\'market_demand\')">Demand <span class="sa">▼</span></th><th data-c="clarity" onclick="sortBy(\'clarity\')">Clarity <span class="sa">▼</span></th><th data-c="buyer_pool" onclick="sortBy(\'buyer_pool\')">Buyers <span class="sa">▼</span></th><th data-c="geo_niche" onclick="sortBy(\'geo_niche\')">Geo+N <span class="sa">▼</span></th><th data-c="resell_speed" onclick="sortBy(\'resell_speed\')">Speed <span class="sa">▼</span></th>';
+}
+
+if(!pageData.length){tb.innerHTML='<tr><td colspan="'+colCount+'" class="empty-msg">'+(isBrand?'No brandable domains found — run analysis first':'No domains in this view')+'</td></tr>';
+document.getElementById('pg').innerHTML='';return;}
+
+let h='';
+pageData.forEach((d,i)=>{
+const rk=start+i+1;
+const rkH=rk===1?'<td class="rk1">🥇</td>':rk===2?'<td class="rk2">🥈</td>':rk===3?'<td class="rk3">🥉</td>':'<td class="rkn">'+rk+'</td>';
+const geoH=d.is_geo&&d.geo_name?'<span class="geo-badge">📍'+d.geo_name+'</span>':'';
+const brandBadge=(!isBrand&&d.is_brandable)?'<span class="b-badge">✨</span>':'';
+const domainCell='<td class="td-d" title="'+d.domain+'" onclick="event.stopPropagation()" style="cursor:text;user-select:text"><div style="display:flex;align-items:center;gap:10px"><span style="overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1">'+d.domain+'</span>'+geoH+brandBadge+'<div class="act-btns"><button class="act-btn act-btn-copy" onclick="copyDomain(\''+d.domain+'\')" title="Copy Domain">📋</button><button class="act-btn" onclick="openModal(\''+d.domain+'\')" title="View Details">📊</button></div></div></td>';
+const spd=d.resell_speed||'Slow';
+
+if(isBrand){
+// Brandable tab row
+const bs=d.brandable_score||0;
+const bscol=bs>=75?'var(--brand)':bs>=55?'#818cf8':'var(--txt3)';
+const bsbg=bs>=75?'linear-gradient(90deg,#7c3aed,#c084fc)':bs>=55?'linear-gradient(90deg,#6366f1,#818cf8)':'linear-gradient(90deg,#374151,#4b5563)';
+const ax=d.brand_axes||{};
+h+='<tr onclick="toggleDetail(\''+d.domain+'\')">'+rkH+domainCell;
+h+='<td><div class="b-score-wrap"><span class="b-score-val" style="color:'+bscol+'">'+bs+'</span><div class="b-score-bar"><div class="b-score-fill" style="width:'+Math.min(bs,100)+'%;background:'+bsbg+'"></div></div></div></td>';
+h+='<td><span class="dec-tag dec-'+d.verdict+'">'+d.verdict+'</span></td>';
+h+='<td><span class="dt-badge dt-'+d.domain_type+'">'+dtLabel(d.domain_type)+'</span></td>';
+h+='<td>'+_mkBaCell(ax.length||0,10)+'</td>';
+h+='<td>'+_mkBaCell(ax.pronounce||0,20)+'</td>';
+h+='<td>'+_mkBaCell(ax.memory||0,20)+'</td>';
+h+='<td>'+_mkBaCell(ax.pattern||0,15)+'</td>';
+h+='<td>'+_mkBaCell(ax.letters||0,15)+'</td>';
+h+='</tr>';
+// Brandable expanded detail
+if(expandedDomain===d.domain){
+const priceH=d.price_low>0?'<span class="price-tag">$'+d.price_low.toLocaleString()+' - $'+d.price_high.toLocaleString()+'</span>':'<span class="dim">N/A</span>';
+h+='<tr class="detail-row"><td colspan="'+colCount+'"><div class="detail-content"><div class="detail-grid"><div><div class="detail-label">Market Verdict</div><div class="detail-val"><span class="dec-tag dec-'+d.verdict+'">'+d.verdict+'</span></div></div><div><div class="detail-label">Market Score</div><div class="detail-val" style="color:var(--pri2);font-weight:700">'+d.total_score+' / 100</div></div><div><div class="detail-label">Est. Value</div><div class="detail-val">'+priceH+'</div></div><div><div class="detail-label">Resell Speed</div><div class="detail-val"><span class="speed-badge sp-'+spd+'">'+(spd==='Fast'?'⚡':spd==='Medium'?'⏳':'🐌')+' '+spd+'</span></div></div><div><div class="detail-label">Market Signals</div><div class="detail-val">'+_mkBaCell(ax.market||0,20)+' / 20</div></div><div><div class="detail-label">Target Buyer</div><div class="detail-val">'+esc(d.target_buyer||'-')+'</div></div></div><div class="brand-reasoning">✨ '+escBreaks(d.brand_reasoning||'No brand analysis available')+'</div></div></td></tr>';}
+}else{
+// Standard row
+const s=d.total_score;
+const bc=s>=78?'linear-gradient(90deg,#f59e0b,#d97706)':s>=60?'linear-gradient(90deg,#4ade80,#22c55e)':s>=40?'linear-gradient(90deg,#818cf8,#6366f1)':'linear-gradient(90deg,#374151,#4b5563)';
+const sc=s>=78?'var(--gem1)':s>=60?'var(--grn)':s>=40?'var(--hold)':'var(--txt3)';
+h+='<tr onclick="toggleDetail(\''+d.domain+'\')">'+rkH+domainCell;
+h+='<td><span class="dec-tag dec-'+d.verdict+'">'+d.verdict+'</span></td>';
+h+='<td><span class="dt-badge dt-'+d.domain_type+'">'+dtLabel(d.domain_type)+'</span></td>';
+const bsv=d.brandable_score||0;
+const brandCell=d.is_brandable?'<span class="ba-cell ba-hi" title="'+esc(d.brand_reasoning||'Brandable')+'">✨ '+bsv+'</span>':(bsv>=45?'<span class="ba-cell ba-mid" title="Brandable score"> '+bsv+'</span>':'<span class="dim">-</span>');
+h+='<td>'+brandCell+'</td>';
+h+='<td><div class="sc"><span class="sv" style="color:'+sc+'">'+s+'</span><div class="sb"><div class="sf" style="width:'+Math.min(s,100)+'%;background:'+bc+'"></div></div></div></td>';
+// KPS column — show all matched keywords in tooltip
+const kpsVal=d.kps_score||0;
+const kpsTierCol={'ultra':'#f59e0b','premium':'#4ade80','high':'#60a5fa','mid':'#a78bfa','low':'#9ca3af','none':'#4b5563'}[d.kps_tier||'none']||'#9ca3af';
+let kpsTip='KPS '+kpsVal+'/100 — '+(d.kps_tier||'none').toUpperCase();
+const _allKws=d.kps_all_matches||[];
+if(_allKws.length>0){kpsTip+='\nKeywords: '+_allKws.map(m=>m.keyword+' ('+m.match_type+', '+m.sale_count+' sales, $'+Math.round(m.avg_price).toLocaleString()+')').join('\n         ');
+}else if(d.kps_keyword){kpsTip+='\nKeyword: '+d.kps_keyword+' ('+(d.kps_match_type||'?')+')';}
+if(d.kps_evidence_bonus>0)kpsTip+='\n+'+d.kps_evidence_bonus+' pts evidence bonus';
+const _kwCount=_allKws.length||(d.kps_keyword?1:0);
+const _kwBadge=_kwCount>1?' <span style="color:var(--txt4);font-size:.55rem">'+_kwCount+'kw</span>':'';
+h+='<td title="'+kpsTip.replace(/"/g,'&quot;')+'"><span style="color:'+kpsTierCol+';font-weight:700;font-size:.82rem">'+kpsVal+'</span><span style="color:var(--txt4);font-size:.62rem">/100</span>'+_kwBadge+'</td>';
+// ML columns
+const mlInv=d.ml_investment_score||0;
+const mlPrc=d.ml_price_estimate||0;
+const mlG=d.ml_grade||'PASS';
+const mlCol={'GEM':'var(--gem1)','BUY':'var(--grn)','HOLD':'var(--hold)','PASS':'var(--txt4)'}[mlG]||'var(--txt4)';
+const mlBar=Math.round(mlInv*100);
+const mlTip='ML grade: '+mlG+'\nConfidence: '+(mlInv*100).toFixed(1)+'%\nEst. price: $'+Math.round(mlPrc).toLocaleString();
+h+='<td title="'+mlTip.replace(/"/g,'&quot;')+'"><div class="sc"><span class="sv" style="color:'+mlCol+'">'+(mlInv*100).toFixed(0)+'%</span><div class="sb"><div class="sf" style="width:'+mlBar+'%;background:linear-gradient(90deg,'+mlCol+',rgba(255,255,255,.3))"></div></div></div></td>';
+h+='<td title="'+mlTip.replace(/"/g,'&quot;')+'"><span style="color:'+mlCol+';font-weight:700;font-size:.78rem">'+(mlPrc>=1000?(mlPrc/1000).toFixed(1)+'k':'$'+Math.round(mlPrc))+'</span><span class="dec-tag dec-'+mlG+'" style="font-size:.55rem;padding:1px 5px;margin-left:4px">'+mlG+'</span></td>';
+h+='<td>'+_mkCell(d.commercial_intent,25)+'</td><td>'+_mkCell(d.market_demand,20)+'</td><td>'+_mkCell(d.clarity,15)+'</td><td>'+_mkCell(d.buyer_pool,15)+'</td><td>'+_mkCell(d.geo_niche,15)+'</td>';
+h+='<td><span class="speed-badge sp-'+spd+'">'+(spd==='Fast'?'⚡':spd==='Medium'?'⏳':'🐌')+' '+spd+'</span></td></tr>';
+// Standard expanded detail
+if(expandedDomain===d.domain){
+const nicheH=d.niche&&d.niche!=='-'?'<span class="nt n-found">'+esc(d.niche)+'</span>':'<span class="nt n-none">None</span>';
+const anchorNote=d.kps_anchored?'<span style="font-size:.6rem;color:var(--pri2);margin-left:4px">📊 KPS-anchored</span>':'';
+const priceH=d.price_low>0?'<span class="price-tag">$'+d.price_low.toLocaleString()+' – $'+d.price_high.toLocaleString()+'</span>'+anchorNote:'<span class="dim">N/A</span>';
+
+// KPS Panel
+const kpsTierColors={'ultra':'#f59e0b','premium':'#4ade80','high':'#60a5fa','mid':'#a78bfa','low':'#9ca3af','none':'#4b5563'};
+const kpsTierColor=kpsTierColors[d.kps_tier||'none']||'#9ca3af';
+const kpsMatchLabel={'exact':'Exact Domain','prefix':'Prefix Keyword','suffix':'Suffix Keyword','middle':'Embedded Keyword'}[d.kps_match_type]||'-';
+let kpsPanel='';
+if(d.kps_score>0&&d.kps_keyword){
+  const allKwMatches=d.kps_all_matches||[];
+  // Build keyword cards for ALL matched keywords
+  let kwCardsHtml='';
+  if(allKwMatches.length>0){
+    kwCardsHtml=allKwMatches.map(m=>{
+      const mType={'exact':'Exact','prefix':'Prefix','suffix':'Suffix','middle':'Middle'}[m.match_type]||m.match_type;
+      const mCol=kpsTierColors[d.kps_tier||'none']||'#9ca3af';
+      return '<div style="background:rgba(15,23,42,.5);border:1px solid rgba(245,158,11,.15);border-radius:6px;padding:6px 10px;text-align:center">' 
+        +'<div style="font-weight:700;color:var(--txt1);font-size:.82rem">'+esc(m.keyword)+'</div>'
+        +'<span style="background:rgba(245,158,11,.12);color:'+mCol+';border:1px solid '+mCol+'44;border-radius:4px;padding:0 5px;font-size:.58rem;font-weight:700;text-transform:uppercase">'+mType+'</span>'
+        +'<div style="margin-top:4px;font-size:.68rem"><span style="color:var(--grn);font-weight:700">$'+Math.round(m.avg_price).toLocaleString()+'</span>'
+        +' <span style="color:var(--txt4)">avg</span></div>'
+        +'<div style="font-size:.65rem;color:var(--pri2)">'+m.sale_count+' sales · max $'+Math.round(m.max_price).toLocaleString()+'</div>'
+        +'</div>';
+    }).join('');
+  }else{
+    const matchBadge='<span style="background:rgba(245,158,11,.12);color:'+kpsTierColor+';border:1px solid '+kpsTierColor+'44;border-radius:4px;padding:1px 6px;font-size:.65rem;font-weight:700;text-transform:uppercase">'+d.kps_match_type+'</span>';
+    kwCardsHtml='<div style="background:rgba(15,23,42,.5);border:1px solid rgba(245,158,11,.15);border-radius:6px;padding:6px 10px;text-align:center">' 
+      +'<div style="font-weight:700;color:var(--txt1);font-size:.82rem">'+esc(d.kps_keyword)+'</div>'+matchBadge
+      +'<div style="margin-top:4px;font-size:.68rem"><span style="color:var(--grn);font-weight:700">$'+Math.round(d.kps_avg_price).toLocaleString()+'</span> avg</div>'
+      +'<div style="font-size:.65rem;color:var(--pri2)">'+d.kps_sale_count+' sales · max $'+Math.round(d.kps_max_price).toLocaleString()+'</div>'
+      +'</div>';
+  }
+  kpsPanel='<div style="margin-top:12px;padding:10px 12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);border-radius:8px">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:'+kpsTierColor+'">⚡ Keyword Power Score</span>'
+    +'<span style="font-weight:800;color:'+kpsTierColor+';font-size:.9rem">'+d.kps_score+'/100</span>'
+    +'<span style="background:'+kpsTierColor+'22;color:'+kpsTierColor+';border:1px solid '+kpsTierColor+'55;border-radius:12px;padding:1px 8px;font-size:.65rem;font-weight:700;text-transform:uppercase">'+d.kps_tier+'</span>'
+    +'</div>'
+    +'<div style="font-size:.62rem;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">MATCHED KEYWORDS ('+Math.max(allKwMatches.length,1)+')</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px">'+kwCardsHtml+'</div>'
+    +(d.kps_evidence_bonus>0?'<div style="margin-top:6px;font-size:.65rem;color:'+kpsTierColor+'">+'+d.kps_evidence_bonus+' pts evidence bonus applied to total score</div>':'')
+    +'</div>';
+}
+
+// ML valuation panel
+let mlPanel='';
+if(d.ml_price_estimate>0||d.ml_investment_score>0){
+  const mlTierColor={'GEM':'#f59e0b','BUY':'#4ade80','HOLD':'#818cf8','PASS':'#6b7280'}[d.ml_grade||'PASS']||'#6b7280';
+  const _mlProba=d.ml_grade_proba||{};
+  let probRows='';
+  for(const g in _mlProba){probRows+='<div style="display:flex;justify-content:space-between;font-size:.65rem"><span style="color:var(--txt3)">'+g+'</span><span style="color:'+mlTierColor+'">'+(_mlProba[g]*100).toFixed(1)+'%</span></div>';}
+  mlPanel='<div style="margin-top:12px;padding:10px 12px;background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.18);border-radius:8px">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--pri2)">🤖 ML Valuation</span>'
+    +'<span class="dec-tag dec-'+(d.ml_grade||'PASS')+'" style="font-size:.65rem">'+(d.ml_grade||'PASS')+'</span>'
+    +'<span style="font-weight:800;color:var(--pri2);font-size:.9rem">$'+Math.round(d.ml_price_estimate||0).toLocaleString()+'</span>'
+    +'</div>'
+    +'<div style="font-size:.62rem;color:var(--txt3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">CLASS PROBABILITIES</div>'
+    +probRows
+    +'<div style="margin-top:6px;font-size:.65rem;color:var(--txt3)">Investment confidence: <span style="color:var(--pri2)">'+((d.ml_investment_score||0)*100).toFixed(1)+'%</span></div>'
+    +'</div>';
+}
+
+h+='<tr class="detail-row"><td colspan="'+colCount+'"><div class="detail-content"><div class="detail-grid"><div><div class="detail-label">Target Buyer</div><div class="detail-val">'+esc(d.target_buyer||'-')+'</div></div><div><div class="detail-label">Niche</div><div class="detail-val">'+nicheH+'</div></div><div><div class="detail-label">Est. Value</div><div class="detail-val">'+priceH+'</div></div><div><div class="detail-label">Liquidity</div><div class="detail-val">'+_mkCell(d.liquidity,10)+' / 10</div></div><div><div class="detail-label">Resell Speed</div><div class="detail-val"><span class="speed-badge sp-'+spd+'">'+(spd==='Fast'?'⚡':spd==='Medium'?'⏳':'🐌')+' '+spd+'</span></div></div><div><div class="detail-label">Penalties</div><div class="detail-val">'+(d.penalties<0?'<span style="color:var(--red)">'+d.penalties+' — '+esc(d.penalty_reasons||'')+'</span>':'<span class="dim">None</span>')+'</div></div></div>'+kpsPanel+mlPanel+'<div class="reasoning-text">💭 '+escBreaks(d.reasoning||'No reasoning available')+'</div></div></td></tr>';}
+}
+});
+tb.innerHTML=h;
+
+let pg='<span style="color:var(--txt3);font-size:.72rem;">Showing '+(start+1)+'-'+Math.min(start+PG_SIZE,totalItems)+' of '+totalItems+'</span> ';
+if(totalPages>1){
+if(curPage>0)pg+='<button class="btn btn-ghost btn-sm" onclick="goPage(0)">«</button> <button class="btn btn-ghost btn-sm" onclick="goPage('+(curPage-1)+')">‹</button> ';
+pg+='<span style="color:var(--pri2);font-size:.8rem;font-weight:700;margin:0 8px;">'+(curPage+1)+'/'+totalPages+'</span>';
+if(curPage<totalPages-1)pg+='<button class="btn btn-ghost btn-sm" onclick="goPage('+(curPage+1)+')">›</button> <button class="btn btn-ghost btn-sm" onclick="goPage('+(totalPages-1)+')">»</button>';}
+document.getElementById('pg').innerHTML=pg;}
+
+function toggleDetail(domain){
+expandedDomain=expandedDomain===domain?null:domain;
+renderTbl();}
+
+function goPage(p){curPage=p;renderTbl();document.querySelector('.table-wrap').scrollTop=0;}
+
+function renderEx(){rExL('et',eTm,'etc');rExL('eh',eHd,'ehc');rExL('eg',eGb,'egc');}
+function rExL(id,items,cid){document.getElementById(cid).textContent='('+items.length+')';
+document.getElementById(id).innerHTML=items.length?items.slice(0,80).map(d=>'<span class="ex-item">'+d+'</span>').join(''):'<span class="dim">None</span>';}
+
+function sTab(t,el){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+el.classList.add('active');cTab=t;curPage=0;expandedDomain=null;
+// Auto-switch sort column for brandable tab
+if(t==='brandable'){sCol='brandable_score';sAsc=false;}
+else if(sCol==='brandable_score'){sCol='total_score';sAsc=false;}
+document.getElementById('ta-area').style.display=t==='excluded'?'none':'block';
+document.getElementById('ex-area').style.display=t==='excluded'?'block':'none';
+if(t==='excluded')renderEx();else renderTbl();}
+
+function sortBy(c){if(sCol===c)sAsc=!sAsc;else{sCol=c;sAsc=false;}curPage=0;
+renderTbl();
+// Mark sorted column on freshly rebuilt thead
+document.querySelectorAll('thead th').forEach(th=>{th.classList.remove('sorted');const a=th.querySelector('.sa');if(a)a.textContent='▼';});
+const th=document.querySelector('th[data-c="'+c+'"]');
+if(th){th.classList.add('sorted');const a=th.querySelector('.sa');if(a)a.textContent=sAsc?'▲':'▼';}}
+
+function onSrch(){clearTimeout(_srchTimer);_srchTimer=setTimeout(()=>{sq=document.getElementById('si').value;curPage=0;renderTbl();},300);}
+
+function toast(m,t='success'){const el=document.createElement('div');el.className='toast toast-'+t;el.textContent=m;
+document.body.appendChild(el);setTimeout(()=>el.classList.add('show'),10);
+setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},3500);}
+
+function copyDomain(d){
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(d).then(()=>toast('✅ '+d+' copied!')).catch(()=>{_fallbackCopy(d);});}else{_fallbackCopy(d);}}
+function _fallbackCopy(d){const el=document.createElement('textarea');el.value=d;el.style.position='fixed';el.style.opacity='0';document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);toast('✅ '+d+' copied!');}
+
+function openModal(domain){
+const d=R.find(x=>x.domain===domain);if(!d)return;
+event.stopPropagation();
+document.getElementById('mt').textContent='تحليل النطاق: '+d.domain;
+let h='<div class="m-sec pri"><div class="m-lab">أسباب اختيار النطاق والتحليل</div><div class="m-reason">'+escBreaks(d.reasoning_ar||'لا يوجد تحليل متاح حالياً باللغة العربية')+'</div></div>';
+
+// KPS Panel (Arabic)
+if(d.kps_score>0&&d.kps_keyword){
+const kpsTierAr={'ultra':'ممتاز','premium':'مميز','high':'عالي','mid':'متوسط','low':'منخفض','none':'لا يوجد'}[d.kps_tier]||d.kps_tier;
+const kpsMatchAr={'exact':'مطابقة تامة','prefix':'بادئة','suffix':'لاحقة','middle':'مضمّنة'}[d.kps_match_type]||'';
+const kpsTierColors={'ultra':'#f59e0b','premium':'#4ade80','high':'#60a5fa','mid':'#a78bfa','low':'#9ca3af','none':'#4b5563'};
+const tc=kpsTierColors[d.kps_tier||'none']||'#9ca3af';
+h+='<div style="margin:14px 0 0;padding:12px 14px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:10px;direction:rtl">';
+h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+h+='<span style="font-size:.68rem;font-weight:700;color:'+tc+'">⚡ مؤشر قوة الكلمة المفتاحية (KPS)</span>';
+h+='<span style="font-weight:800;color:'+tc+';font-size:.9rem">'+d.kps_score+'/100</span>';
+h+='<span style="background:'+tc+'22;color:'+tc+';border:1px solid '+tc+'55;border-radius:10px;padding:1px 8px;font-size:.65rem;font-weight:700">'+kpsTierAr+'</span>';
+h+='</div>';
+// Show ALL matched keywords in Arabic modal
+const arMatches=d.kps_all_matches||[];
+h+='<div style="font-size:.62rem;color:var(--txt3);margin-bottom:6px;font-weight:700">الكلمات المفتاحية المكتشفة ('+Math.max(arMatches.length,1)+')</div>';
+h+='<div class="m-grid" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">';
+if(arMatches.length>0){
+  arMatches.forEach(m=>{
+    const mAr={'exact':'مطابقة','prefix':'بادئة','suffix':'لاحقة','middle':'مضمّنة'}[m.match_type]||m.match_type;
+    h+='<div class="m-card" style="text-align:center"><div class="m-lab" style="font-size:.7rem;font-weight:700;color:var(--txt1)">'+esc(m.keyword)+'</div>';
+    h+='<span style="font-size:.58rem;color:'+tc+'">'+mAr+'</span>';
+    h+='<div style="color:var(--grn);font-weight:700;font-size:.85rem;margin-top:2px">$'+Math.round(m.avg_price).toLocaleString()+'</div>';
+    h+='<div style="font-size:.62rem;color:var(--pri2)">'+m.sale_count+' صفقة</div></div>';
+  });
+}else{
+  h+='<div class="m-card" style="text-align:center"><div class="m-lab">الكلمة</div><div class="m-val" style="color:var(--txt1)">'+esc(d.kps_keyword)+'<br><span style="font-size:.62rem;color:'+tc+'">'+kpsMatchAr+'</span></div></div>';
+  h+='<div class="m-card" style="text-align:center"><div class="m-lab">متوسط سعر البيع</div><div class="m-val" style="color:var(--grn)">$'+Math.round(d.kps_avg_price).toLocaleString()+'</div></div>';
+  h+='<div class="m-card" style="text-align:center"><div class="m-lab">عدد الصفقات الفعلية</div><div class="m-val" style="color:var(--pri2)">'+d.kps_sale_count+'<span style="font-size:.65rem;color:var(--txt4)"> صفقة</span></div></div>';
+}
+h+='</div>';
+if(d.kps_evidence_bonus>0)h+='<div style="margin-top:6px;font-size:.65rem;color:'+tc+'">تمت إضافة +'+d.kps_evidence_bonus+' نقطة مكافأة للنطاق بناءً على بيانات المعاملات الفعلية</div>';
+h+='</div>';}
+
+// ML valuation panel (Arabic)
+if(d.ml_price_estimate>0||d.ml_investment_score>0){
+  const mlGAr={'GEM':'جوهرة','BUY':'شراء','HOLD':'انتظار','PASS':'تجاهل'}[d.ml_grade||'PASS']||d.ml_grade;
+  const mlTc={'GEM':'#f59e0b','BUY':'#4ade80','HOLD':'#818cf8','PASS':'#6b7280'}[d.ml_grade||'PASS']||'#6b7280';
+  const _mlProba=d.ml_grade_proba||{};
+  let probAr='';
+  for(const g in _mlProba){probAr+='<div style="display:flex;justify-content:space-between;font-size:.65rem"><span style="color:var(--txt3)">'+({'GEM':'جوهرة','BUY':'شراء','HOLD':'انتظار','PASS':'تجاهل'}[g]||g)+'</span><span style="color:'+mlTc+'">'+(_mlProba[g]*100).toFixed(1)+'%</span></div>';}
+  h+='<div style="margin:14px 0 0;padding:12px 14px;background:rgba(14,165,233,.07);border:1px solid rgba(14,165,233,.2);border-radius:10px;direction:rtl">';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+  h+='<span style="font-size:.68rem;font-weight:700;color:var(--pri2)">🤖 تقييم نموذج التعلم الآلي</span>';
+  h+='<span style="background:'+mlTc+'22;color:'+mlTc+';border:1px solid '+mlTc+'55;border-radius:10px;padding:1px 8px;font-size:.65rem;font-weight:700">'+mlGAr+'</span>';
+  h+='<span style="font-weight:800;color:var(--pri2);font-size:.9rem">$'+Math.round(d.ml_price_estimate||0).toLocaleString()+'</span>';
+  h+='</div>';
+  h+='<div style="font-size:.62rem;color:var(--txt3);margin-bottom:6px;font-weight:700">نسب الثقة بالتصنيف</div>'+probAr;
+  h+='<div style="margin-top:6px;font-size:.65rem;color:var(--txt3)">ثقة الاستثمار: <span style="color:var(--pri2)">'+((d.ml_investment_score||0)*100).toFixed(1)+'%</span></div>';
+  h+='</div>';
+}
+
+h+='<div class="m-grid">';
+h+='<div class="m-card"><div class="m-lab">المشتري المستهدف</div><div class="m-val">'+esc(d.target_buyer_ar||'-')+'</div></div>';
+h+='<div class="m-card"><div class="m-lab">القيمة التقديرية</div><div class="m-val" style="color:var(--grn);font-weight:800">'+(d.price_low>0?'$'+d.price_low.toLocaleString()+' – $'+d.price_high.toLocaleString()+(d.kps_anchored?' <span style="font-size:.6rem;color:var(--pri2)">(مرسّخة بالبيانات)</span>':''):'غير محدد')+'</div></div>';
+h+='</div>';
+// Brandable section
+if(d.is_brandable){
+const ax=d.brand_axes||{};
+h+='<div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--bdr)">';
+h+='<div class="m-lab" style="color:var(--brand)">✨ تحليل البراندبل — Brandable Analysis</div>';
+h+='<div class="m-reason" style="background:rgba(192,132,252,.06);border-color:rgba(192,132,252,.2);color:var(--brand);margin-top:8px">'+escBreaks(d.brand_reasoning||'No brand analysis available')+'</div>';
+h+='<div class="m-grid" style="grid-template-columns:repeat(3,1fr);margin-top:12px">';
+const baxes=[['Length',ax.length,10],['Pronounce',ax.pronounce,20],['Memory',ax.memory,20],['Pattern',ax.pattern,15],['Letters',ax.letters,15],['Market',ax.market,20]];
+baxes.forEach(([lbl,val,mx])=>{const pct=mx>0?Math.round((val||0)/mx*100):0;const col=pct>=70?'var(--brand)':pct>=40?'var(--hold)':'var(--txt3)';h+='<div class="m-card" style="text-align:center"><div class="m-lab">'+lbl+'</div><div class="m-val" style="color:'+col+';font-size:1.1rem;font-weight:800">'+(val||0)+'<span style="font-size:.65rem;color:var(--txt4)"> /'+mx+'</span></div></div>';});
+h+='</div>';
+h+='<div style="text-align:center;margin-top:10px"><span style="background:var(--brand2);color:var(--brand);padding:4px 16px;border-radius:20px;font-weight:800;font-size:.85rem;border:1px solid var(--brand3)">✨ Brandable Score: '+d.brandable_score+' / 100'+(d.brandable_rank?' · Rank #'+d.brandable_rank:'')+'</span></div>';
+h+='</div>';}
+
+
+// CSV Metadata Section
+const meta=d.csv_metadata||{};
+if(Object.keys(meta).length>0){
+h+='<div style="margin-top:25px"><div class="m-lab">البيانات الإضافية (من ملف CSV)</div><div class="m-grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">';
+const mLabels={cpc:'تكلفة النقرة (CPC)',sv:'حجم البحث (SV)',reg:'التسجيلات (REG)',aby:'عمر النطاق (Birth)',bl:'باك لينك (BL)',dp:'شعبية النطاق (DP)',acr:'الأرشيف (ACR)',rdt:'النطاقات المشابهة'};
+for(const k in meta){
+const lbl=mLabels[k]||k.toUpperCase();
+h+='<div class="m-card" style="text-align:center"><div class="m-lab">'+lbl+'</div><div class="m-val" style="color:var(--pri2)">'+meta[k]+'</div></div>';}
+h+='</div></div>';}
+
+document.getElementById('mb').innerHTML=h;
+document.getElementById('mo').classList.add('show');}
+
+function closeModal(){document.getElementById('mo').classList.remove('show');}
+
+init();
+</script>
+</body>
+</html>
